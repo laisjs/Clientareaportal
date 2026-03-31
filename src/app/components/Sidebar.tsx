@@ -1,0 +1,93 @@
+import { 
+  FileText, 
+  CreditCard, 
+  Wallet, 
+  LogOut,
+  ChevronRight
+} from 'lucide-react';
+import { cn } from './ui/utils';
+
+interface SidebarProps {
+  activeTab: string;
+  setActiveTab: (tab: string) => void;
+}
+
+export function Sidebar({ activeTab, setActiveTab }: SidebarProps) {
+  const menuItems = [
+    { id: 'contracts', label: 'Meus Contratos', icon: FileText },
+    { id: 'payments', label: 'Meus Pagamentos', icon: CreditCard },
+    { id: 'billing-methods', label: 'Meio de Pagamento', icon: Wallet },
+  ];
+
+  return (
+    <aside className="w-[280px] h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 z-50">
+      {/* Logo Section */}
+      <div className="p-8 pb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-[#500d5b] rounded-lg flex items-center justify-center shrink-0">
+            <span className="text-white font-semibold text-xl italic leading-none">i</span>
+          </div>
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900 leading-none">iMilk</h1>
+            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mt-1">Portal do Cliente</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="h-px w-full bg-gray-100" />
+
+      {/* Navigation */}
+      <nav className="flex-1 px-4 mt-8 space-y-1">
+        <p className="px-4 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-6">Área do Cliente</p>
+        
+        {menuItems.map((item) => {
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => setActiveTab(item.id)}
+              className={cn(
+                "w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group",
+                isActive 
+                  ? "bg-[#500d5b]/[0.08] text-[#500d5b]" 
+                  : "text-slate-600 hover:bg-gray-50"
+              )}
+            >
+              <div className="flex items-center gap-3">
+                <item.icon className={cn(
+                  "size-[18px] transition-colors", 
+                  isActive ? "text-[#500d5b]" : "text-slate-400 group-hover:text-slate-600"
+                )} />
+                <span className={cn(
+                  "text-sm font-semibold tracking-tight",
+                  isActive ? "text-[#500d5b]" : "text-slate-600"
+                )}>
+                  {item.label}
+                </span>
+              </div>
+              {isActive && <ChevronRight className="size-4 text-[#500d5b]" />}
+            </button>
+          );
+        })}
+      </nav>
+
+      {/* User Session Footer */}
+      <div className="mt-auto border-t border-gray-100 p-6 pt-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-500 border border-gray-200">
+            CB
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <p className="text-sm font-semibold text-gray-900 leading-tight">Fazenda Boa Vista</p>
+            <p className="text-xs text-gray-500 truncate">cliente@email.com</p>
+          </div>
+        </div>
+        
+        <button className="flex items-center gap-2 text-red-500 hover:text-red-600 transition-colors px-1 cursor-pointer">
+          <LogOut className="size-4 rotate-180" />
+          <span className="text-sm font-semibold">Sair do Portal</span>
+        </button>
+      </div>
+    </aside>
+  );
+}
