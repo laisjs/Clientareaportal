@@ -1,5 +1,6 @@
 import { mockContracts } from '../../data/contracts';
 import { ContractCard } from '../components/ContractCard';
+import { ProductIcon } from '../components/ProductIcon';
 import { FileText, ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
 
@@ -8,15 +9,17 @@ export function Dashboard() {
   const closedContracts = mockContracts.filter((c) => c.status === 'Encerrado');
   const [showClosedContracts, setShowClosedContracts] = useState(false);
 
+  const hasOnFarm = activeContracts.some((c) => c.isOnFarm);
+
   return (
-    <div className="bg-gray-50 pb-20">
+    <div className="bg-gray-50">
       {/* Header da Página */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <header className="bg-white border-b border-gray-200 sticky top-14 lg:top-0 z-40">
         <div className="max-w-7xl mx-auto px-8 py-8">
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-2 text-xs font-semibold text-gray-400 tracking-widest mb-4">
-                <span className="capitalize">Portal iMilk</span>
+                <span className="capitalize">Rúmina</span>
                 <ChevronRight className="size-3" />
                 <span className="text-[#500d5b] capitalize">Meus contratos</span>
               </div>
@@ -40,6 +43,25 @@ export function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-8 py-8">
+                {/* Banner On Farm */}
+        {hasOnFarm && (
+          <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-5 bg-[#500d5b]/[0.05] border border-[#500d5b]/20 rounded-xl">
+            <div className="flex items-center gap-4">
+              <ProductIcon productName="On Farm" size="md" className="shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-gray-900">Você tem acesso ao On Farm</p>
+                <p className="text-xs text-gray-500 mt-0.5">Acesse a loja On Farm para gerenciar seus insumos e pedidos.</p>
+              </div>
+            </div>
+            <button
+              onClick={() => alert('Redirecionando para loja On Farm...')}
+              className="shrink-0 px-4 py-2 bg-[#500d5b] text-white text-sm font-semibold rounded-lg hover:bg-[#3d0a45] transition-colors"
+            >
+              Acessar Loja
+            </button>
+          </div>
+        )}
+        
         {/* Contracts Section */}
         <section className="mb-8">
           {activeContracts.length > 0 ? (
@@ -87,22 +109,7 @@ export function Dashboard() {
           </section>
         )}
 
-        {/* Support Info - Mais discreto */}
-        <div className="mt-8 px-4 py-3 bg-gray-100 rounded-lg border border-gray-200">
-          <p className="text-xs text-gray-600 text-center">
-            Dúvidas? Entre em contato: <span className="font-medium text-gray-700">suporte@imilk.com.br</span> • <span className="font-medium text-gray-700">(11) 1234-5678</span>
-          </p>
-        </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-12">
-        <div className="max-w-7xl mx-auto px-8 py-6">
-          <p className="text-xs text-gray-500 text-center">
-            © 2026 iMilk - Sistema de Gestão de Fazendas. Todos os direitos reservados.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

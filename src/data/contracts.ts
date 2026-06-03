@@ -6,24 +6,24 @@ export interface Payment {
 }
 
 export interface Customer {
-  companyName: string; // Razão Social
-  tradeName: string; // Nome Fantasia
-  document: string; // CNPJ or CPF
+  companyName: string;
+  tradeName: string;
+  document: string;
 }
 
 export interface ContractValues {
-  currentValue: number; // Valor vigente
-  originalValue?: number; // Valor original (se houve renegociação)
-  discounts?: number; // Descontos aplicados
-  finalValue: number; // Valor final
+  currentValue: number;
+  originalValue?: number;
+  discounts?: number;
+  finalValue: number;
 }
 
 export interface BillingInfo {
   financialStatus: 'Adimplente' | 'Inadimplente';
   lastBillingDate: string;
   nextBillingDate: string;
-  frequency: string; // e.g. "Mensal", "Anual"
-  paymentMethod: string; // e.g. "Cartão de Crédito", "Boleto"
+  frequency: string;
+  paymentMethod: string;
 }
 
 export interface AgreementTerm {
@@ -40,16 +40,46 @@ export interface AdditionalService {
 export interface Farm {
   id: string;
   name: string;
-  location: string; // Cidade/Estado
-  area: string; // Área em hectares
+  location: string;
+  area: string;
   status: 'Ativo' | 'Inativo';
   activationDate: string;
+  rewardPoints?: number;
 }
 
 export interface IncludedProduct {
   name: string;
   description: string;
-  icon?: string; // Nome do produto para mapear o ícone (ex: 'Rumi Flow', 'Ideagri')
+  icon?: string;
+}
+
+export interface ShipmentOrderItem {
+  name: string;
+  quantity: number;
+}
+
+export interface ShipmentOrder {
+  id: string;
+  type: 'recurrence' | 'smartlab' | 'replacement';
+  orderTypeLabel: string;
+  status: string;
+  expectedDate: string;
+  items: ShipmentOrderItem[];
+}
+
+export interface PartnershipPlan {
+  enabled: boolean;
+  partnerName: string;
+  discountRate: number;
+  ratioUnit: string;
+}
+
+export interface ContractFreezing {
+  isFrozen: boolean;
+  type: string;
+  startDate: string;
+  endDate?: string;
+  reason?: string;
 }
 
 export interface Contract {
@@ -57,14 +87,12 @@ export interface Contract {
   identifier: string;
   status: 'Vigente' | 'Encerrado';
   clientName: string;
-  planName: string; // Nome do plano: "Ideagri Pro", "Ideagri Básico", etc
-  productName: string; // Nome do produto: "Ideagri", "On Farm", etc
+  planName: string;
+  productName: string;
   startDate: string;
   endDate?: string;
   summary: string;
   pdfUrl: string;
-  
-  // New detailed fields
   customer: Customer;
   values: ContractValues;
   billing: BillingInfo;
@@ -72,7 +100,15 @@ export interface Contract {
   agreementTerm: AgreementTerm;
   additionalServices?: AdditionalService[];
   farms?: Farm[];
-  includedProducts?: IncludedProduct[]; // Produtos incluídos no plano
+  includedProducts?: IncludedProduct[];
+  isOnFarm?: boolean;
+  paymentLink?: {
+    status: 'pending' | 'expired' | 'failed';
+    url: string;
+  };
+  partnershipPlan?: PartnershipPlan;
+  freezing?: ContractFreezing;
+  shipmentOrders?: ShipmentOrder[];
 }
 
 export const mockContracts: Contract[] = [
@@ -101,6 +137,10 @@ export const mockContracts: Contract[] = [
       nextBillingDate: '01/02/2025',
       frequency: 'Mensal',
       paymentMethod: 'Cartão de Crédito',
+    },
+    paymentLink: {
+      status: 'expired',
+      url: '#',
     },
     paymentHistory: [
       { id: 'p1', date: '01/01/2025', amount: 2500.00, status: 'Pago' },
@@ -155,6 +195,19 @@ export const mockContracts: Contract[] = [
       frequency: 'Mensal',
       paymentMethod: 'Boleto',
     },
+    partnershipPlan: {
+      enabled: true,
+      partnerName: 'AgroTech Solutions Ltda',
+      discountRate: 10,
+      ratioUnit: 'porcentagem',
+    },
+    freezing: {
+      isFrozen: true,
+      type: 'Parcial',
+      startDate: '01/03/2025',
+      endDate: '30/06/2025',
+      reason: 'Período de entressafra — suspensão temporária acordada contratualmente.',
+    },
     paymentHistory: [
       { id: 'p4', date: '15/12/2024', amount: 3200.00, status: 'Pago' },
       { id: 'p5', date: '15/11/2024', amount: 3200.00, status: 'Pago' },
@@ -178,7 +231,7 @@ export const mockContracts: Contract[] = [
     productName: 'Ideagri',
     startDate: '10/03/2023',
     endDate: '10/03/2024',
-    summary: 'Contrato de prestação de serviços de consultoria em gestão de fazendas e implementação do sistema iMilk. Contrato finalizado conforme cronograma estabelecido.',
+    summary: 'Contrato de prestação de serviços de consultoria em gestão de fazendas e implementação do sistema. Contrato finalizado conforme cronograma estabelecido.',
     pdfUrl: '#',
     customer: {
       companyName: 'Primavera Agronegócios Ltda',
@@ -262,8 +315,9 @@ export const mockContracts: Contract[] = [
     planName: 'On Farm',
     productName: 'On Farm',
     startDate: '15/01/2025',
-    summary: 'Contrato de plataforma On Farm para gestão integrada da fazenda com módulos de controle de estoque, nutrição animal, planejamento de safra e análise de solo. Acesso completo a ferramentas de gestão financeira.',
+    summary: 'Contrato de plataforma On Farm para gestão integrada da fazenda com módulos de controle de estoque, nutrição animal, planejamento de safra e análise de solo.',
     pdfUrl: '#',
+    isOnFarm: true,
     customer: {
       companyName: 'Alto da Serra Agropecuária Ltda',
       tradeName: 'Fazenda Alto da Serra',
@@ -280,6 +334,10 @@ export const mockContracts: Contract[] = [
       frequency: 'Mensal',
       paymentMethod: 'Cartão de Crédito',
     },
+    paymentLink: {
+      status: 'pending',
+      url: '#',
+    },
     paymentHistory: [
       { id: 'p13', date: '15/01/2025', amount: 2800.00, status: 'Pago' },
     ],
@@ -291,8 +349,31 @@ export const mockContracts: Contract[] = [
       { name: 'Módulo de Rastreabilidade', value: 250.00, status: 'Ativo' },
     ],
     farms: [
-      { id: 'f5', name: 'Fazenda Alto da Serra - Unidade 1', location: 'Goiás/GO', area: '600', status: 'Ativo', activationDate: '15/01/2025' },
-      { id: 'f5b', name: 'Fazenda Alto da Serra - Unidade 2', location: 'Goiás/GO', area: '450', status: 'Ativo', activationDate: '15/01/2025' },
+      { id: 'f5', name: 'Fazenda Alto da Serra - Unidade 1', location: 'Goiás/GO', area: '600', status: 'Ativo', activationDate: '15/01/2025', rewardPoints: 350 },
+      { id: 'f5b', name: 'Fazenda Alto da Serra - Unidade 2', location: 'Goiás/GO', area: '450', status: 'Ativo', activationDate: '15/01/2025', rewardPoints: 120 },
+    ],
+    shipmentOrders: [
+      {
+        id: 'so1',
+        type: 'recurrence',
+        orderTypeLabel: 'Recorrência',
+        status: 'em_separacao',
+        expectedDate: '15/02/2025',
+        items: [
+          { name: 'Kit Sensor Rúmi Plus', quantity: 2 },
+          { name: 'Bateria de Reposição AA', quantity: 8 },
+        ],
+      },
+      {
+        id: 'so2',
+        type: 'smartlab',
+        orderTypeLabel: 'SmartLab',
+        status: 'enviado',
+        expectedDate: '10/02/2025',
+        items: [
+          { name: 'Análise de Solo SmartLab Premium', quantity: 1 },
+        ],
+      },
     ],
   },
 ];

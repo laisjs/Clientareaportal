@@ -1,8 +1,8 @@
-import ideagriIcon from 'figma:asset/7294337bec6a54cc77bc61766ae19189dbdc678a.png';
-import rumiFlowIcon from 'figma:asset/341e72b38085758e067f478121d4409fbd0baffb.png';
-import onFarmIcon from 'figma:asset/9ece7af519bbd55e5e9e28ec85a91ac808e02130.png';
-import rumiAnalyzerIcon from 'figma:asset/4804a2c362a4c486796fe203337e0ea6d69afa22.png';
-import rumiPulseIcon from 'figma:asset/7121ec929018bc8700d60cc718a8245b49c9b06f.png';
+import ideagriIcon from './../../assets/7294337bec6a54cc77bc61766ae19189dbdc678a.png';
+import rumiFlowIcon from './../../assets/341e72b38085758e067f478121d4409fbd0baffb.png';
+import onFarmIcon from './../../assets/9ece7af519bbd55e5e9e28ec85a91ac808e02130.png';
+import rumiAnalyzerIcon from './../../assets/4804a2c362a4c486796fe203337e0ea6d69afa22.png';
+import rumiPulseIcon from './../../assets/7121ec929018bc8700d60cc718a8245b49c9b06f.png';
 
 interface ProductIconProps {
   productName: string;
