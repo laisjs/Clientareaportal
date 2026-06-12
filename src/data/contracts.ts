@@ -26,9 +26,21 @@ export interface BillingInfo {
   paymentMethod: string;
 }
 
+export interface TermRecord {
+  id: string;
+  version: string;
+  termDate: string;
+  status: 'accepted' | 'pending';
+  isNewVersion?: boolean;
+  acceptedAt?: string;
+}
+
 export interface AgreementTerm {
   hasAdhesionTerm: boolean;
   termDate?: string;
+  termAcceptanceStatus?: 'accepted' | 'pending';
+  termVersion?: string;
+  terms?: TermRecord[];
 }
 
 export interface AdditionalService {
@@ -150,6 +162,12 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '01/01/2025',
+      termAcceptanceStatus: 'pending',
+      termVersion: '2026-01',
+      terms: [
+        { id: 'ta1-v1', version: '2025-01', termDate: '01/01/2025', status: 'accepted', acceptedAt: '01/01/2025' },
+        { id: 'ta1-v2', version: '2026-01', termDate: '01/03/2026', status: 'pending', isNewVersion: true },
+      ],
     },
     additionalServices: [
       { name: 'API de Parceiros', value: 150.00, status: 'Ativo' },
@@ -217,6 +235,12 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '15/06/2024',
+      termAcceptanceStatus: 'pending',
+      termVersion: '2026-01',
+      terms: [
+        { id: 'ta2-v1', version: '2024-06', termDate: '15/06/2024', status: 'accepted', acceptedAt: '15/06/2024' },
+        { id: 'ta2-v2', version: '2026-01', termDate: '01/03/2026', status: 'pending', isNewVersion: true },
+      ],
     },
     farms: [
       { id: 'f2', name: 'Fazenda Santa Clara', location: 'Rio de Janeiro/RJ', area: '300', status: 'Ativo', activationDate: '15/06/2024' },
@@ -257,6 +281,9 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '10/03/2023',
+      terms: [
+        { id: 'ta3-v1', version: '2023-03', termDate: '10/03/2023', status: 'accepted', acceptedAt: '10/03/2023' },
+      ],
     },
     farms: [
       { id: 'f3', name: 'Fazenda Primavera', location: 'Belo Horizonte/MG', area: '400', status: 'Inativo', activationDate: '10/03/2023' },
@@ -302,6 +329,9 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '20/11/2024',
+      terms: [
+        { id: 'ta4-v1', version: '2024-11', termDate: '20/11/2024', status: 'accepted', acceptedAt: '20/11/2024' },
+      ],
     },
     farms: [
       { id: 'f4', name: 'Fazenda Esperança', location: 'Curitiba/PR', area: '200', status: 'Ativo', activationDate: '20/11/2024' },
@@ -344,6 +374,9 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '15/01/2025',
+      terms: [
+        { id: 'ta5-v1', version: '2025-01', termDate: '15/01/2025', status: 'accepted', acceptedAt: '15/01/2025' },
+      ],
     },
     additionalServices: [
       { name: 'Módulo de Rastreabilidade', value: 250.00, status: 'Ativo' },

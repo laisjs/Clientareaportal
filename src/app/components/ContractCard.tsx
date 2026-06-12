@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { TermRecord } from '../../data/contracts';
+import { TermAcceptanceModal } from './TermAcceptanceModal';
 import { Contract } from '../../data/contracts';
 import { StatusBadge } from './StatusBadge';
 import { ProductIcon } from './ProductIcon';
@@ -21,11 +23,17 @@ import {
   Star,
   Handshake,
   Snowflake,
+  Eye,
+  Download,
 } from 'lucide-react';
 import { cn } from './ui/utils';
+import { toast } from 'sonner';
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip';
 
 interface ContractCardProps {
   contract: Contract;
+  termPending?: boolean;
+  onAcceptTerm?: () => void;
 }
 
 const ORDER_TYPE_BADGE: Record<string, string> = {
@@ -41,8 +49,9 @@ const ORDER_STATUS_LABELS: Record<string, string> = {
   aguardando: 'Aguardando',
 };
 
-export function ContractCard({ contract }: ContractCardProps) {
+export function ContractCard({ contract, termPending, onAcceptTerm }: ContractCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [viewingTerm, setViewingTerm] = useState<TermRecord | null>(null);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -79,6 +88,17 @@ export function ContractCard({ contract }: ContractCardProps) {
           <div className="flex items-center gap-3 flex-1">
             <ProductIcon productName={contract.productName} size="sm" className="shrink-0" />
             <h3 className="text-sm font-semibold text-gray-900">{contract.planName}</h3>
+            {termPending && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div className="flex items-center gap-1.5 px-2.5 py-1 ml-2 bg-amber-50 border border-amber-200 rounded-md cursor-default animate-pulse">
+                    <AlertTriangle className="size-3.5 text-amber-600" />
+                    <span className="text-[11px] font-semibold text-amber-700 uppercase tracking-wider">Termo pendente</span>
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent side="top">Termo pendente</TooltipContent>
+              </Tooltip>
+            )}
             {isInadimplente && (
               <div className="flex items-center gap-1.5 px-2.5 py-1 bg-red-50 border border-red-200 rounded-md ml-2 animate-pulse">
                 <AlertTriangle className="size-3.5 text-red-600" />
@@ -127,6 +147,27 @@ export function ContractCard({ contract }: ContractCardProps) {
               >
                 Regularizar Agora
               </button>
+            </div>
+          )}
+
+          {/* Termo de Adesão pendente */}
+          {termPending && (
+            <div className="px-5 py-3 border-b border-blue-100 bg-blue-50 flex items-center gap-4">
+              <div className="p-2 bg-blue-100 rounded-full shrink-0">
+                <FileSignature className="size-4 text-[#0d99ff]" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-bold text-blue-900">Termo de Adesão pendente de assinatura</p>
+                <p className="text-xs text-blue-700 mt-0.5">O aceite formal deste contrato ainda não foi registrado.</p>
+              </div>
+              {onAcceptTerm && (
+                <button
+                  className="px-3 py-1.5 text-[11px] font-semibold text-white bg-[#0d99ff] rounded-md hover:bg-blue-600 transition-colors shrink-0"
+                  onClick={(e) => { e.stopPropagation(); onAcceptTerm(); }}
+                >
+                  Aceitar Termo
+                </button>
+              )}
             </div>
           )}
 
@@ -463,30 +504,88 @@ export function ContractCard({ contract }: ContractCardProps) {
             </div>
           )}
 
-          {/* Termo de Adesão */}
-          {contract.agreementTerm && (
-            <div className="px-5 py-4 border-b border-gray-200">
-              <div className="rounded-lg border px-4 py-3" style={{ borderColor: '#0d99ff', backgroundColor: 'rgba(13, 153, 255, 0.03)' }}>
-                <div className="flex items-start gap-2">
-                  <FileSignature className="size-4 mt-px shrink-0" style={{ color: '#0d99ff' }} />
-                  <div className="flex-1">
-                    <h4 className="text-xs font-bold mb-1.5 uppercase tracking-wide" style={{ color: '#0d99ff' }}>
-                      Contrato via Termo de Adesão
-                    </h4>
-                    <p className="text-xs text-gray-700 mb-2">
-                      Formalizado em: <span className="font-medium">{contract.agreementTerm.termDate}</span>
-                    </p>
-                    <button
-                      onClick={(e) => { e.stopPropagation(); alert('Solicitação de cópia enviada ao setor jurídico.'); }}
-                      className="inline-flex items-center gap-1 text-[11px] font-semibold hover:opacity-70 transition-opacity"
-                      style={{ color: '#0d99ff' }}
+          {/* Termos de Adesão */}
+          {contract.agreementTerm?.terms && contract.agreementTerm.terms.length > 0 && (
+            <div className="p-5 bg-white border-b border-gray-200">
+              <h4 className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-3">Termos de Adesão</h4>
+              <div className="space-y-2">
+                {[...contract.agreementTerm.terms].sort((a, b) => b.version.localeCompare(a.version)).map((term) => {
+                  const isAccepted = term.status === 'accepted';
+                  return (
+                    <div
+                      key={term.id}
+                      className={cn(
+                        'flex items-center justify-between px-4 py-2.5 rounded-lg border transition-colors',
+                        isAccepted
+                          ? 'border-gray-200 bg-gray-50/30 hover:bg-gray-50'
+                          : 'border-amber-200 bg-amber-50/50 hover:bg-amber-50'
+                      )}
                     >
-                      Solicitar cópia formal do termo →
-                    </button>
-                  </div>
-                </div>
+                      {/* Lado esquerdo — ícone + versão + badge Nova versão */}
+                      <div className="flex items-center gap-2 shrink-0">
+                        <FileSignature className={cn('size-4 shrink-0', isAccepted ? 'text-gray-400' : 'text-amber-500')} />
+                        <span className="text-sm font-semibold text-gray-900">Versão {term.version}</span>
+                        {term.isNewVersion && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 bg-[#0d99ff]/10 text-[#0d99ff] border border-[#0d99ff]/30 rounded uppercase tracking-wider">
+                            Nova versão
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Lado direito — status, datas e ações */}
+                      <div className="flex items-center gap-2 ml-auto shrink-0">
+                        <div className={cn(
+                          'px-2.5 py-1 rounded-md text-[9px] font-bold uppercase tracking-wider',
+                          isAccepted
+                            ? 'bg-[#1bc47d]/10 text-[#1bc47d] border border-[#1bc47d]/20'
+                            : 'bg-amber-100 text-amber-700 border border-amber-200'
+                        )}>
+                          {isAccepted ? 'Aceito' : 'Pendente'}
+                        </div>
+                        <span className="text-xs text-gray-500">
+                          Enviado em: {term.termDate}
+                          {isAccepted && term.acceptedAt && ` · Aceito em: ${term.acceptedAt}`}
+                        </span>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); setViewingTerm(term); }}
+                          className="p-1.5 rounded-md text-gray-400 hover:text-[#0d99ff] hover:bg-[#0d99ff]/10 transition-colors"
+                          title="Visualizar termo"
+                        >
+                          <Eye className="size-3.5" />
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toast.success('Download iniciado.'); }}
+                          className="p-1.5 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                          title="Baixar termo"
+                        >
+                          <Download className="size-3.5" />
+                        </button>
+                        {!isAccepted && onAcceptTerm && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); onAcceptTerm(); }}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-xs font-semibold text-amber-800 hover:bg-amber-100 transition-colors"
+                          >
+                            Aceitar →
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
+          )}
+
+          {/* Modal de visualização de termo (read-only) */}
+          {viewingTerm && (
+            <TermAcceptanceModal
+              isOpen={true}
+              viewOnly={true}
+              contractName={`${contract.planName} · ${contract.identifier}`}
+              termVersion={viewingTerm.version}
+              clientName={contract.customer.tradeName}
+              onClose={() => setViewingTerm(null)}
+            />
           )}
 
           {/* Documentação */}
