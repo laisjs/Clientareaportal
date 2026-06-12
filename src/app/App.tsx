@@ -5,6 +5,7 @@ import { PaymentsPage } from './pages/PaymentsPage';
 import { BillingMethodsPage } from './pages/BillingMethodsPage';
 import { ShipmentsPage } from './pages/ShipmentsPage';
 import { ReturnsPage } from './pages/ReturnsPage';
+import { TermAcceptancePublicPage } from './pages/TermAcceptancePublicPage';
 import { Toaster } from 'sonner';
 
 export default function App() {
@@ -22,6 +23,8 @@ export default function App() {
         return <ShipmentsPage />;
       case 'returns':
         return <ReturnsPage />;
+      case 'term-acceptance-layout':
+        return <TermAcceptancePublicPage />;
       default:
         return (
           <div className="flex-1 p-12 flex flex-col items-center justify-center text-center min-h-screen bg-gray-50">

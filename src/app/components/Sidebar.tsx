@@ -7,6 +7,7 @@ import {
   Package,
   RotateCcw,
   X,
+  FileSignature,
 } from 'lucide-react';
 import { cn } from './ui/utils';
 import ruminaIcon from '../../assets/rumina-icon.png';
@@ -24,6 +25,10 @@ const menuItems = [
   { id: 'billing-methods', label: 'Meio de Pagamento', icon: Wallet },
   { id: 'shipments', label: 'Minhas Remessas', icon: Package },
   { id: 'returns', label: 'Devoluções', icon: RotateCcw },
+];
+
+const layoutItems = [
+  { id: 'term-acceptance-layout', label: 'Termo de Adesão', icon: FileSignature },
 ];
 
 export function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
@@ -112,6 +117,47 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarPro
             );
           })}
         </nav>
+
+        {/* Layouts Section */}
+        <div className="px-4 mt-6">
+          <div className="h-px w-full bg-gray-100 mb-4" />
+          <p className="px-4 text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            Layouts
+          </p>
+          {layoutItems.map((item) => {
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item.id)}
+                className={cn(
+                  'w-full flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200 group',
+                  isActive
+                    ? 'bg-[#500d5b]/[0.08] text-[#500d5b]'
+                    : 'text-slate-600 hover:bg-gray-50',
+                )}
+              >
+                <div className="flex items-center gap-3">
+                  <item.icon
+                    className={cn(
+                      'size-[18px] transition-colors',
+                      isActive ? 'text-[#500d5b]' : 'text-slate-400 group-hover:text-slate-600',
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      'text-sm font-semibold tracking-tight',
+                      isActive ? 'text-[#500d5b]' : 'text-slate-600',
+                    )}
+                  >
+                    {item.label}
+                  </span>
+                </div>
+                {isActive && <ChevronRight className="size-4 text-[#500d5b]" />}
+              </button>
+            );
+          })}
+        </div>
 
         {/* User Session Footer */}
         <div className="mt-auto border-t border-gray-100 p-4 lg:p-6 pt-6 lg:pt-8">
