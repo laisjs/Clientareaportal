@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { FileSignature, CheckCircle2, Clock, Loader2 } from 'lucide-react';
+import { FileSignature, CheckCircle2, Loader2 } from 'lucide-react';
 import { cn } from '../components/ui/utils';
 import ruminaIcon from '../../assets/rumina-icon.png';
 
-type PageState = 'pending' | 'accepted' | 'expired';
+type PageState = 'pending' | 'accepted';
 
 const TERM_TEXT = `TERMO DE ADESÃO — PLATAFORMA RÚMINA
 
@@ -58,7 +58,7 @@ export function TermAcceptancePublicPage() {
       <div className="bg-white border-b border-gray-200 shrink-0">
         <div className="max-w-lg mx-auto px-4 py-3 flex items-center gap-2">
           <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mr-2">Estado:</span>
-          {(['pending', 'accepted', 'expired'] as PageState[]).map((state) => (
+          {(['pending', 'accepted'] as PageState[]).map((state) => (
             <button
               key={state}
               onClick={() => switchState(state)}
@@ -69,7 +69,7 @@ export function TermAcceptancePublicPage() {
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               )}
             >
-              {state === 'pending' ? 'Pendente' : state === 'accepted' ? 'Aceito' : 'Link Expirado'}
+              {state === 'pending' ? 'Pendente' : 'Aceito'}
             </button>
           ))}
         </div>
@@ -237,32 +237,6 @@ export function TermAcceptancePublicPage() {
             </motion.div>
           )}
 
-          {/* Estado: Link expirado */}
-          {pageState === 'expired' && (
-            <motion.div
-              key="expired"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.96 }}
-              transition={{ duration: 0.18 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 w-full max-w-lg text-center px-6 py-10"
-            >
-              <div className="flex justify-center mb-5">
-                <div className="p-4 bg-amber-50 rounded-full">
-                  <Clock className="size-12 text-amber-500" />
-                </div>
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900">Link expirado</h2>
-              <p className="text-sm text-gray-500 mt-2 max-w-sm mx-auto">
-                Este link é válido por 72 horas após o envio. O prazo para este link já foi encerrado.
-              </p>
-
-              <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800 text-left">
-                Para solicitar um novo link, acesse a{' '}
-                <span className="font-semibold">Área do Cliente</span> ou entre em contato com o suporte Rúmina.
-              </div>
-            </motion.div>
-          )}
 
         </AnimatePresence>
 
