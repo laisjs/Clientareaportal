@@ -374,8 +374,10 @@ export const mockContracts: Contract[] = [
     agreementTerm: {
       hasAdhesionTerm: true,
       termDate: '15/01/2025',
+      termAcceptanceStatus: 'pending',
       terms: [
         { id: 'ta5-v1', version: '2025-01', termDate: '15/01/2025', status: 'accepted', acceptedAt: '15/01/2025' },
+        { id: 'ta5-v2', version: '2025-06', termDate: '01/06/2025', status: 'pending', isNewVersion: true },
       ],
     },
     additionalServices: [

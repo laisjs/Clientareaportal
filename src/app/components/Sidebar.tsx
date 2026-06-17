@@ -17,6 +17,7 @@ interface SidebarProps {
   setActiveTab: (tab: string) => void;
   isOpen: boolean;
   onClose: () => void;
+  hasPendingOnFarmTerm?: boolean;
 }
 
 const menuItems = [
@@ -31,7 +32,7 @@ const layoutItems = [
   { id: 'term-acceptance-layout', label: 'Termo de Adesão', icon: FileSignature },
 ];
 
-export function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarProps) {
+export function Sidebar({ activeTab, setActiveTab, isOpen, onClose, hasPendingOnFarmTerm }: SidebarProps) {
   const handleNavClick = (tabId: string) => {
     setActiveTab(tabId);
     onClose();
@@ -48,7 +49,8 @@ export function Sidebar({ activeTab, setActiveTab, isOpen, onClose }: SidebarPro
 
       <aside
         className={cn(
-          'w-[280px] h-screen bg-white border-r border-gray-100 flex flex-col fixed left-0 top-0 z-50 transition-transform duration-300',
+          'w-[280px] bg-white border-r border-gray-100 flex flex-col fixed left-0 z-50 transition-transform duration-300',
+          hasPendingOnFarmTerm ? 'top-10 h-[calc(100vh-2.5rem)]' : 'top-0 h-screen',
           '-translate-x-full lg:translate-x-0',
           isOpen && 'translate-x-0',
         )}
